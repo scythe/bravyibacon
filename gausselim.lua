@@ -72,6 +72,15 @@ function esearch(degree)
          print("minimal polynomial found!")
          return ret
       end
+   end,
+   function()
+      v = {}
+      for i = 1, #vecs do
+         for j = 1, degree do
+            v[#v+1] = vecs[i][j] or 0
+         end
+      end
+      return v, #vecs, degree
    end
 end
 

@@ -1,4 +1,4 @@
-
+#!/usr/bin/lua5.2
 
 gausselim = require "gausselim"
 primitivepoly = require "primitivepoly"
@@ -21,12 +21,17 @@ end
 function minipoly(field, ele)
    local pfind = gausselim.esearch(field.bits)
    local ret
-   local npow = ele
+   local npow = field[ele]
+   print("npow: ", table.concat(npow, ", "))
    local z = setmetatable({0}, primitivepoly.Polynomial) --used to force copying npow
    repeat
+      print(gausselim.Vector)
       ret = pfind(setmetatable(z+npow, gausselim.Vector))
-      npow = (npow * ele) % field.mod
+      npow = (npow * field[ele]) % field.mod
+      print("mod: ", table.concat(field.mod, ", "))
+      print("npow: ", table.concat(npow, ", "))
    until ret
+   print(table.concat(ret, ", "))
    return setmetatable(ret, primitivepoly.Polynomial)
 end
 
@@ -45,11 +50,13 @@ function bchpoly(exp, dist)
    local field = construct(exp)
    local mpolys = {field.mod}
    for i = 2, dist-1 do
-      mpolys[i] = minipoly(field, i+1)
+      mpolys[i] = setmetatable(minipoly(field, i+1), Polynomial)
    end
 
    local p, zero = setmetatable({1}, primitivepoly.Polynomial), setmetatable({0}, primitivepoly.Polynomial)
    for i = 1, #mpolys do
+      print("mpoly:", table.concat(mpolys[i]), "p:", table.concat(p))
+      print("remainder:", table.concat(p % mpolys[i]))
       if(p % mpolys[i] ~= zero) then
          p = p * mpolys[i]
       end
@@ -58,4 +65,4 @@ function bchpoly(exp, dist)
    return p
 end
 
-
+return {construct = construct, minipoly = minipoly, bchpoly = bchpoly}

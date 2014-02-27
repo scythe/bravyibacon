@@ -59,7 +59,7 @@ __mul = function(p1, p2)
    ret = {}
    for i = 1, #p1 + #p2 do
       for j = 1, i do
-         ret[i] = ret[i] + (p1[j] or 0) * (p2[i-j+1] or 0)
+         ret[i] = (ret[i] or 0) + (p1[j] or 0) * (p2[i-j+1] or 0)
       end
       ret[i] = ret[i] % 2
    end
@@ -68,12 +68,19 @@ end,
 __mod = function(p1, p2)
    if(getmetatable(p1) ~= getmetatable(p2)) then return nil end
    ret = p1
-   for i = #p1, #p2+1, -1 do
+
+   --"trim" trailing zeroes off of the modulus. This actually works perfectly, and doesn't alter its behavior at all.
+   for i = #p2, 1, -1 do
+      if(p2[i] == 1) then break end
+      p2[i] = nil
+   end
+
+   for i = #p1, #p2, -1 do
       if(ret[i] > 0) then
          ret = ret + (p2 - (i - #p2))
       end
    end
-   return ret
+   return setmetatable(ret, getmetatable(p1))
 end,
 __pow = function(p1, n, mod)
    if(type(n) ~= "number" or n%1 ~= 0 or n < 0) then return nil end
@@ -90,8 +97,9 @@ __call = function(self, p, mod)
    end
    return ret
 end,
-_eq = function(a, b)
+__eq = function(a, b)
    if(getmetatable(a) ~= getmetatable(b)) then return false end
+   print("not stupid")
    for i = 1, math.max(#a, #b) do
       if((a[i] or 0) ~= (b[i] or 0)) then return false end
    end

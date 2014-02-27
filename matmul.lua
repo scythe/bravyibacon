@@ -1,4 +1,4 @@
-gausselim = require "gausselim.lua"
+gausselim = require "gausselim"
 
 local Vector = gausselim.Vector
 
@@ -21,10 +21,22 @@ __index = function(self, tuple)
    return ret
 end,
 __newindex = function(self, tuple, val)
-   rawset(self, (tuple[1]-1) * rawget(self, "cols") + tuple[2], val)
+   if(getmetatable(val) == Vector) then
+      if(not tuple[2]) then
+         for i = 1, rawget(self, "cols") do
+            self[tuple[1] * rawget(self, "cols") + i] = val[i] or 0
+         end
+      elseif(not tuple[1]) then
+         for i = 1, rawget(self, "rows") do
+             self[(i-1) * rawget(self, "cols") + tuple[2]] = val[i] or 0
+         end
+      end
+   else
+      rawset(self, (tuple[1]-1) * rawget(self, "cols") + tuple[2], val)
+   end
 end,
 __add = function(ml, mr)
-   if(getmetatable(ml) == getmetatable(mr) and #ml == #mr and #ml[{1}] = #mr[{1}]) then
+   if(getmetatable(ml) == getmetatable(mr) and #ml == #mr and #ml[{1}] == #mr[{1}]) then
      local ret = Vector.__add(ml, mr)
      for k, v in pairs(ml) do
         if(type(k) ~= "table") then
@@ -45,14 +57,32 @@ __mul = function(ml, mr)
       end
    end
    return ret
-end}
+end,
+__concat = function(mat, str)
+   if(type(str) ~= "string") then return (mat .. "") .. (str .. "") end
+   s = ""
+   for i = 1, #mat[{nil, 1}] do
+      s = s .. "\n" .. table.concat[mat[{i}]]
+   end
+   return s .. str
+end
+}
+
 
 construct = function(v, rows, cols)
-   if(type(v) == "table" and #v = rows * cols) then
+   if(type(v) == "table" and #v == rows * cols) then
       v.rows = rows
       v.cols = cols
       return setmetatable(v, Matrix)
    end
 end
 
-return {Matrix = Matrix, construct = construct}
+transpose = function(mat)
+   local ret = setmetatable({rows = #mat[{1}], cols = #mat[{nil, 1}]}, Matrix)
+   for i = 1, #mat[{1}] do
+      ret[{i}] = mat[{nil, i}]
+   end
+   return ret
+end
+
+return {Matrix = Matrix, construct = construct, transpose = transpose}
