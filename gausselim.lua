@@ -3,12 +3,20 @@ __add = function(a, b)
    if(getmetatable(a) ~= getmetatable(b)) then return nil end
    ret = {}
    for i = 1, math.max(#a, #b) do
-      ret[i] = (a[i] or 0) + (b[i] or 0)
+      ret[i] = ((a[i] or 0) + (b[i] or 0)) % 2
    end
-   return ret
+   return setmetatable(ret, getmetatable(a))
 end,
 __sub = function(a, b)
    return a + b --arithmetic in fields of characteristic two is fun!
+end,
+__mul = function(a, b)
+   if(getmetatable(a) ~= getmetatable(b)) then return nil end
+   ret = 0
+   for i = 1, math.min(#a, #b) do
+      ret = (ret + a[i] * b[i]) % 2
+   end
+   return ret
 end
 }
 
@@ -34,17 +42,20 @@ function esearch(degree)
    one.deg = 1
    local vecs = {one}
    return function(vec)
+      print("pfind executing: ", getmetatable(vec))
       local deg = degv(vec)
       for i = 1, #vecs do
          vec[degree + i] = 0
       end
       vec[#vecs + degree + 1] = 1
       for i = 1, #vecs do
+         --print(table.concat(vecs[i], ", "))
          if deg < vecs[i].deg then
-            table.insert(vecs, vec, i)
+            table.insert(vecs, i, vec)
             break
          end
          if (vec[vecs[i].deg] == 1) then
+            print("eliminating: ", getmetatable(vec), getmetatable(vecs[i]))
             vec = vec + vecs[i]
             deg = degv(vec)
          end
@@ -58,6 +69,7 @@ function esearch(degree)
          for i = degree + 1, #vec do
             table.insert(ret, vec[i])
          end
+         print("minimal polynomial found!")
          return ret
       end
    end
