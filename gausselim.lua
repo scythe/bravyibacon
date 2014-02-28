@@ -1,4 +1,7 @@
-Vector = {
+
+local gausselim = {}
+
+gausselim.Vector = {
 __add = function(a, b)
    if(getmetatable(a) ~= getmetatable(b)) then return nil end
    ret = {}
@@ -20,7 +23,7 @@ __mul = function(a, b)
 end
 }
 
-function degv(vec)
+local function degv(vec)
    for i = 1, #vec do
       if(vec[i] == 1) then 
          vec.deg = i
@@ -33,17 +36,12 @@ end
 --We add a new vector to the matrix and perform Gaussian elimination 
 --until an added vector becomess the zero vector. We then return a
 --vector in the kernel of the matrix of the original vectors.
-function esearch(degree)
-   local one = setmetatable({1}, Vector)
-   for i = 1, degree-1 do
-      one[i+1] = 0
-   end
-   one[degree+1] = 1
-   one.deg = 1
-   local vecs = {one}
+function gausselim.esearch(degree)
+   local vecs = {}
    return function(vec)
-      print("pfind executing: ", getmetatable(vec))
+      print("pfind executing: ", getmetatable(vec), table.concat(vec))
       local deg = degv(vec)
+      print(deg, degree)
       for i = 1, #vecs do
          vec[degree + i] = 0
       end
@@ -59,10 +57,17 @@ function esearch(degree)
             vec = vec + vecs[i]
             deg = degv(vec)
          end
+         if (vecs[i][deg] == 1) then 
+            vecs[i] = vec + vecs[i]
+            vecs[i].deg = degv(vecs[i])
+         end
          if(i == #vecs) then
             vecs[#vecs + 1] = vec
             break
          end
+      end
+      if(#vecs == 0) then
+         vecs[1] = vec
       end
       if(deg > degree) then
          ret = {}
@@ -78,10 +83,12 @@ function esearch(degree)
       for i = 1, #vecs do
          for j = 1, degree do
             v[#v+1] = vecs[i][j] or 0
+            io.write(vecs[i][j] or "#")
          end
+         print()
       end
       return v, #vecs, degree
    end
 end
 
-return {Vector = Vector, esearch = esearch}
+return gausselim

@@ -5,8 +5,9 @@
   with O(2^50) qubits. We consider it unlikely that any larger codes will ever be used.
   ]]
 
+local primitivepoly = {}
 
-primitive_polynomials = {
+primitivepoly.primitive_polynomials = {
 {0, 1} -- trivial
 , {1, 1, 1}
 , {1, 1, 0, 1}
@@ -34,7 +35,7 @@ primitive_polynomials = {
 , {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
 }
 
-Polynomial = {
+primitivepoly.Polynomial = {
 __add = function(p1, p2)
    if(getmetatable(p1) ~= getmetatable(p2)) then return nil end
    ret = {}
@@ -44,6 +45,7 @@ __add = function(p1, p2)
    return setmetatable(ret, getmetatable(p1))
 end,
 __sub = function(p1, p2)
+   print("shift", p1, p2)
    if(type(p2) ~= "number") then return nil end
    ret = {}
    for i = 1, p2 do
@@ -52,6 +54,7 @@ __sub = function(p1, p2)
    for i = p2+1, p2+#p1 do
       ret[i] = p1[i-p2]
    end
+   print(table.concat(ret), p2, table.concat(p1))
    return setmetatable(ret, getmetatable(p1))
 end,
 __mul = function(p1, p2)
@@ -106,10 +109,10 @@ __eq = function(a, b)
    return true
 end }
    
-for k, v in ipairs(primitive_polynomials) do
-   setmetatable(v, Polynomial)
+for k, v in ipairs(primitivepoly.primitive_polynomials) do
+   setmetatable(v, primitivepoly.Polynomial)
 end
 
-return {primitive_polynomials = primitive_polynomials, Polynomial = Polynomial}
+return primitivepoly
 
 

@@ -3,11 +3,14 @@
 gausselim = require "gausselim"
 primitivepoly = require "primitivepoly"
 
+local bch = {}
 
 --Constructs a finite field of order 2^bits
-function construct(bits)
+function bch.construct(bits)
+   print("running construct()")
    local field = {}
    field.mod = primitivepoly.primitive_polynomials[bits]
+   print(type(field), type(field.mod), bits, type(bits))
    field.bits = bits
    local Polynomial = primitivepoly.Polynomial
    field[1] = setmetatable({1}, Polynomial)
@@ -18,10 +21,10 @@ function construct(bits)
    return field
 end
 
-function minipoly(field, ele)
+function bch.minipoly(field, ele)
    local pfind = gausselim.esearch(field.bits)
    local ret
-   local npow = field[ele]
+   local npow = setmetatable({1}, primitivepoly.Polynomial)
    print("npow: ", table.concat(npow, ", "))
    local z = setmetatable({0}, primitivepoly.Polynomial) --used to force copying npow
    repeat
@@ -37,7 +40,7 @@ end
 
 --Generates a BCH code generator polynomial
 --for a code of length 2^exp and distance dist
-function bchpoly(exp, dist)
+function bch.bchpoly(exp, dist)
    local len = 2^exp-1
    if(dist >= len/2) then
       ret = {}
@@ -47,15 +50,17 @@ function bchpoly(exp, dist)
       return ret
    end
 
-   local field = construct(exp)
+   print("going to run construct()", type(construct))
+   local field = bch.construct(exp)
+   print(type(field))
    local mpolys = {field.mod}
    for i = 2, dist-1 do
-      mpolys[i] = setmetatable(minipoly(field, i+1), Polynomial)
+      mpolys[i] = setmetatable(bch.minipoly(field, i+1), primitivepoly.Polynomial)
    end
 
    local p, zero = setmetatable({1}, primitivepoly.Polynomial), setmetatable({0}, primitivepoly.Polynomial)
    for i = 1, #mpolys do
-      print("mpoly:", table.concat(mpolys[i]), "p:", table.concat(p))
+      print(i, "mpoly:", table.concat(mpolys[i]), "p:", table.concat(p), getmetatable(mpolys[i]), getmetatable(p))
       print("remainder:", table.concat(p % mpolys[i]))
       if(p % mpolys[i] ~= zero) then
          p = p * mpolys[i]
@@ -65,4 +70,4 @@ function bchpoly(exp, dist)
    return p
 end
 
-return {construct = construct, minipoly = minipoly, bchpoly = bchpoly}
+return bch
