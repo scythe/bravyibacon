@@ -17,9 +17,9 @@ __mul = function(a, b)
    if(getmetatable(a) ~= getmetatable(b)) then return nil end
    ret = 0
    for i = 1, math.min(#a, #b) do
-      ret = (ret + a[i] * b[i]) % 2
+      ret = ret + a[i] * b[i]
    end
-   return ret
+   return ret % 2
 end
 }
 
@@ -39,21 +39,17 @@ end
 function gausselim.esearch(degree)
    local vecs = {}
    return function(vec)
-      print("pfind executing: ", getmetatable(vec), table.concat(vec))
       local deg = degv(vec)
-      print(deg, degree)
       for i = 1, #vecs do
          vec[degree + i] = 0
       end
       vec[#vecs + degree + 1] = 1
       for i = 1, #vecs do
-         --print(table.concat(vecs[i], ", "))
          if deg < vecs[i].deg then
             table.insert(vecs, i, vec)
             break
          end
          if (vec[vecs[i].deg] == 1) then
-            print("eliminating: ", getmetatable(vec), getmetatable(vecs[i]))
             vec = vec + vecs[i]
             deg = degv(vec)
          end
@@ -74,7 +70,6 @@ function gausselim.esearch(degree)
          for i = degree + 1, #vec do
             table.insert(ret, vec[i])
          end
-         print("minimal polynomial found!")
          return ret
       end
    end,
@@ -83,9 +78,7 @@ function gausselim.esearch(degree)
       for i = 1, #vecs do
          for j = 1, degree do
             v[#v+1] = vecs[i][j] or 0
-            io.write(vecs[i][j] or "#")
          end
-         print()
       end
       return v, #vecs, degree
    end

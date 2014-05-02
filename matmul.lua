@@ -8,18 +8,21 @@ matmul.Matrix = {
 __index = function(self, tuple)
    local ret
    if(tuple[1] and not tuple[2]) then
+      print"waaaat"
       ret = setmetatable({}, Vector)
       for i = 1, rawget(self, "cols") do
          ret[i] = rawget(self, (tuple[1]-1) * rawget(self, "cols") + i)
       end
    elseif(tuple[2] and not tuple[1]) then
+      print"oh no"
       ret = setmetatable({}, Vector)
       for i = 1, rawget(self, "rows") do
-          print(tuple[2] + (i-1) * rawget(self, "cols"))
           ret[i] = rawget(self, tuple[2] + (i-1) * rawget(self, "cols"))
       end
    elseif(tuple[1] and tuple[2]) then
+      print("this happened", (tuple[1]-1) * rawget(self, "cols") + tuple[2])
       ret = rawget(self, (tuple[1]-1) * rawget(self, "cols") + tuple[2])
+      print(ret)
    end
    return ret
 end,
@@ -57,20 +60,21 @@ __mul = function(ml, mr)
    for i = 1, #ml[{nil, 1}] do
       for j = 1, #mr[{1}] do
          ret[{i, j}] = ml[{i}] * mr[{nil, j}]
-         print(i, j, ret[{i, j}], ml[{i}][j])
       end
    end
    return ret
 end,
 __concat = function(mat, str)
    if(type(str) ~= "string") then return (mat .. "") .. (str .. "") end
-   s = ""
+   s = "{"
    for i = 1, #mat[{nil, 1}] do
-      s = s .. "\n"
+      s = s .. "\n{"
       for k, v in ipairs(mat[{i}]) do
-         s = s .. ({[0] = ' ', [1] = '#'})[v or 0]
+         s = s .. ({[0] = '0,', [1] = '1,'})[v or 0]
       end
+      s = s .. "nil},"
    end
+   s = s .. "nil}"
    return s .. str
 end
 }
@@ -78,14 +82,9 @@ end
 
 matmul.construct = function(v, rows, cols)
    if(type(v) == "table" and #v == rows * cols) then
-      print("Constructing!", rows, cols)
-      print(table.concat(v))
       v.rows = rows
       v.cols = cols
-      print(v[1], v[2], v[3], v[4])
       v = setmetatable(v, matmul.Matrix)
-      print(v[1], v[2], v[3], v[4])
-      print("" .. v)
       return v
    end
 end

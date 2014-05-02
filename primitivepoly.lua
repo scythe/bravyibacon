@@ -45,7 +45,6 @@ __add = function(p1, p2)
    return setmetatable(ret, getmetatable(p1))
 end,
 __sub = function(p1, p2)
-   print("shift", p1, p2)
    if(type(p2) ~= "number") then return nil end
    ret = {}
    for i = 1, p2 do
@@ -54,7 +53,6 @@ __sub = function(p1, p2)
    for i = p2+1, p2+#p1 do
       ret[i] = p1[i-p2]
    end
-   print(table.concat(ret), p2, table.concat(p1))
    return setmetatable(ret, getmetatable(p1))
 end,
 __mul = function(p1, p2)
@@ -102,7 +100,6 @@ __call = function(self, p, mod)
 end,
 __eq = function(a, b)
    if(getmetatable(a) ~= getmetatable(b)) then return false end
-   print("not stupid")
    for i = 1, math.max(#a, #b) do
       if((a[i] or 0) ~= (b[i] or 0)) then return false end
    end
