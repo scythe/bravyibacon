@@ -1,4 +1,4 @@
-#!/usr/bin/lua5.2
+#!/usr/local/bin/luajit
 
 gausselim = require "gausselim"
 primitivepoly = require "primitivepoly"

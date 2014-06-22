@@ -1,4 +1,4 @@
-#!/usr/bin/lua5.2
+#!/usr/local/bin/luajit
 opmat = require "opmat"
 matmul = require "matmul"
 

@@ -1,4 +1,4 @@
-#!/usr/bin/lua5.2
+#!/usr/local/bin/luajit
 codegen = require "codegen"
 
 m = codegen.genmat(arg[1] + 0, arg[2] + 0)

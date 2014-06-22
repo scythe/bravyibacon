@@ -1,4 +1,4 @@
-#!/usr/bin/lua5.2
+#!/usr/local/bin/luajit
 bch = require"bch"
 
 exp = arg[1] + 0

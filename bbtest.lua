@@ -1,4 +1,4 @@
-#!/usr/bin/lua
+#!/usr/local/bin/luajit
 --The Bravyi-Bacon codes require a matrix with columns and rows that have a large code distance,
 --if the columnspace and rowspace of the matrix are treated as classical repetition codes.
 
