@@ -8,21 +8,17 @@ matmul.Matrix = {
 __index = function(self, tuple)
    local ret
    if(tuple[1] and not tuple[2]) then
-      print"waaaat"
       ret = setmetatable({}, Vector)
       for i = 1, rawget(self, "cols") do
          ret[i] = rawget(self, (tuple[1]-1) * rawget(self, "cols") + i)
       end
    elseif(tuple[2] and not tuple[1]) then
-      print"oh no"
       ret = setmetatable({}, Vector)
       for i = 1, rawget(self, "rows") do
           ret[i] = rawget(self, tuple[2] + (i-1) * rawget(self, "cols"))
       end
    elseif(tuple[1] and tuple[2]) then
-      print("this happened", (tuple[1]-1) * rawget(self, "cols") + tuple[2])
       ret = rawget(self, (tuple[1]-1) * rawget(self, "cols") + tuple[2])
-      print(ret)
    end
    return ret
 end,
